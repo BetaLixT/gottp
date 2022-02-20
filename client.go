@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 
 	"github.com/betalixt/gottp/logger"
 )
@@ -14,117 +15,140 @@ type HttpClient struct {
 }
 
 func (httpClient *HttpClient) Get(
-	endpoint string,
 	headers map[string]string,
+	endpoint string,
+	params ...string,
 ) (*Response, error) {
 	return httpClient.action(
 		"GET",
-		endpoint,
 		headers,
+		endpoint,
+		params...,
 	)
 }
 
 func (httpClient *HttpClient) Post(
-	endpoint string,
 	headers map[string]string,
+	endpoint string,
+	params ...string,
 ) (*Response, error) {
 	return httpClient.action(
 		"POST",
-		endpoint,
 		headers,
+		endpoint,
+		params...,
 	)
 }
 
 func (httpClient *HttpClient) Patch(
-	endpoint string,
 	headers map[string]string,
+	endpoint string,
+	params ...string,
 ) (*Response, error) {
 	return httpClient.action(
 		"PATCH",
-		endpoint,
 		headers,
+		endpoint,
+		params...,
 	)
 }
 
 func (httpClient *HttpClient) Put(
-	endpoint string,
 	headers map[string]string,
+	endpoint string,
+	params ...string,
 ) (*Response, error) {
 	return httpClient.action(
 		"PUT",
-		endpoint,
 		headers,
+		endpoint,
+		params...,
 	)
 }
 
 func (httpClient *HttpClient) Delete(
-	endpoint string,
 	headers map[string]string,
+	endpoint string,
+	params ...string,
 ) (*Response, error) {
 	return httpClient.action(
 		"DELETE",
-		endpoint,
 		headers,
+		endpoint,
+		params...,
 	)
 }
 
 func (httpClient *HttpClient) PostBody(
-	endpoint string,
 	headers map[string]string,
 	body interface{},
+	endpoint string,
+	params ...string,
 ) (*Response, error) {
 	return httpClient.actionBody(
 		"POST",
-		endpoint,
 		headers,
 		body,
+		endpoint,
+		params...,
 	)
 }
 
 func (httpClient *HttpClient) PatchBody(
-	endpoint string,
 	headers map[string]string,
 	body interface{},
+	endpoint string,
+	params ...string,
 ) (*Response, error) {
 	return httpClient.actionBody(
 		"PATCH",
-		endpoint,
 		headers,
 		body,
+		endpoint,
+		params...,
 	)
 }
 
 func (httpClient *HttpClient) PutBody(
-	endpoint string,
 	headers map[string]string,
 	body interface{},
+	endpoint string,
+	params ...string,
 ) (*Response, error) {
 	return httpClient.actionBody(
 		"PUT",
-		endpoint,
 		headers,
 		body,
+		endpoint,
+		params...,
 	)
 }
 
 func (httpClient *HttpClient) DeleteBody(
-	endpoint string,
 	headers map[string]string,
 	body interface{},
+	endpoint string,
+	params ...string,
 ) (*Response, error) {
 	return httpClient.actionBody(
 		"DELETE",
-		endpoint,
 		headers,
 		body,
+		endpoint,
+		params...,
 	)
 }
 
 func (httpClient *HttpClient) action(
 	method string,
-	endpoint string,
 	headers map[string]string,
+	endpoint string,
+	pthParms ...string,
 ) (*Response, error) {
+	endpoint, err := formatEp(endpoint, pthParms...)
+	if err != nil {
+		return nil, err
+	}
 	req, err := http.NewRequest(method, endpoint, nil)
 	if err != nil {
 		return nil, err
@@ -148,10 +172,15 @@ func (httpClient *HttpClient) action(
 
 func (httpClient *HttpClient) actionBody(
 	method string,
-	endpoint string,
 	headers map[string]string,
 	body interface{},
+	endpoint string,
+	pthParms ...string,
 ) (*Response, error) {
+	endpoint, err := formatEp(endpoint, pthParms...)
+	if err != nil {
+		return nil, err
+	}
 	req, err := http.NewRequest(method, endpoint, nil)
 	if err != nil {
 		return nil, err
@@ -177,6 +206,46 @@ func (httpClient *HttpClient) actionBody(
 	httpClient.logger.Inf(fmt.Sprintf("resource responded with statusCode %d", resp.StatusCode))
 	respObj := Response(*resp)
 	return &respObj, nil
+}
+
+func formatEp(
+	format string,
+	pthParms ...string,
+) (string, error) {
+	end := len(format)
+	prmCnt := len(pthParms)
+	pthNum := 0
+	var buffer []byte
+	i := 0
+	prev := 0
+	for i < end {
+		for i < end && format[i] != '{' {
+			i++
+		}
+		if i == end {
+			break
+		}
+		if format[i+1] != '}' {
+			return "", fmt.Errorf("illegal character/Invalid format in url")
+		}
+		if pthNum >= prmCnt {
+			return "", fmt.Errorf("not enough parameters provided")
+		}
+		// TODO Maybe can be done in one go?
+		escaped := url.QueryEscape(pthParms[pthNum])
+		buffer = append(buffer, format[prev:i]...)
+		buffer = append(buffer, escaped...)
+		pthNum++
+		i += 2
+		prev = i
+	}
+	if pthNum != prmCnt {
+		return "", fmt.Errorf("too many parameters provided")
+	}
+	if prev < end {
+		buffer = append(buffer, format[prev:end]...)
+	}
+	return string(buffer), nil
 }
 
 // - "Constructors"

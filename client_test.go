@@ -25,8 +25,10 @@ func TestGet(t *testing.T) {
 
 	// - Testing 200
 	resp, err := httpClient.Get(
-		"https://api.zippopotam.us/us/90210",
-		map[string]string{})
+		map[string]string{},
+		"https://api.zippopotam.us/us/{}",
+		"90210",
+	)
 	if err != nil {
 		t.Error("Request failed")
 		t.Error(err)
@@ -64,8 +66,11 @@ func TestGet(t *testing.T) {
 
 	// - Testing 404
 	resp, err = httpClient.Get(
-		"https://api.zippopotam.us/us/9021123",
-		map[string]string{})
+		map[string]string{},
+		"https://api.zippopotam.us/us/{}",
+		"9021123",
+	)
+
 	if err != nil {
 		t.Error("Request failed")
 		t.Error(err)
