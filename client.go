@@ -57,6 +57,17 @@ func (httpClient *HttpClient) Put(
 	)
 }
 
+func (httpClient *HttpClient) Delete(
+	endpoint string,
+	headers map[string]string,
+) (*Response, error) {
+	return httpClient.action(
+		"DELETE",
+		endpoint,
+		headers,
+	)
+}
+
 func (httpClient *HttpClient) PostBody(
 	endpoint string,
 	headers map[string]string,
