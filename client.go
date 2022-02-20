@@ -15,7 +15,7 @@ type HttpClient struct {
 func (httpClient *HttpClient) Get(
 	endpoint string,
 	headers map[string]string,
-) (*http.Response, error) {
+) (*Response, error) {
 	req, err := http.NewRequest("GET", endpoint, nil)
 	if err != nil {
 		return nil, err
@@ -32,7 +32,8 @@ func (httpClient *HttpClient) Get(
 		return nil, err
 	}
 	httpClient.logger.Inf(fmt.Sprintf("resource responded with statusCode %d", resp.StatusCode))
-	return resp, nil
+	respObj := Response(*resp)
+	return &respObj, nil
 }
 
 // - "Constructors"
