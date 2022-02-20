@@ -17,24 +17,44 @@ func (httpClient *HttpClient) Get(
 	endpoint string,
 	headers map[string]string,
 ) (*Response, error) {
-	req, err := http.NewRequest("GET", endpoint, nil)
-	if err != nil {
-		return nil, err
-	}
+	return httpClient.action(
+		"GET",
+		endpoint,
+		headers,
+	)
+}
 
-	for key, value := range headers {
-		req.Header.Add(key, value)
-	}
+func (httpClient *HttpClient) Post(
+	endpoint string,
+	headers map[string]string,
+) (*Response, error) {
+	return httpClient.action(
+		"POST",
+		endpoint,
+		headers,
+	)
+}
 
-	httpClient.logger.Inf(fmt.Sprintf("making http request GET %s", endpoint))
-	resp, err := httpClient.client.Do(req)
-	if err != nil {
-		httpClient.logger.Err("failed to make request")
-		return nil, err
-	}
-	httpClient.logger.Inf(fmt.Sprintf("resource responded with statusCode %d", resp.StatusCode))
-	respObj := Response(*resp)
-	return &respObj, nil
+func (httpClient *HttpClient) Patch(
+	endpoint string,
+	headers map[string]string,
+) (*Response, error) {
+	return httpClient.action(
+		"PATCH",
+		endpoint,
+		headers,
+	)
+}
+
+func (httpClient *HttpClient) Put(
+	endpoint string,
+	headers map[string]string,
+) (*Response, error) {
+	return httpClient.action(
+		"PUT",
+		endpoint,
+		headers,
+	)
 }
 
 func (httpClient *HttpClient) PostBody(
@@ -87,6 +107,32 @@ func (httpClient *HttpClient) DeleteBody(
 		headers,
 		body,
 	)
+}
+
+func (httpClient *HttpClient) action(
+	method string,
+	endpoint string,
+	headers map[string]string,
+) (*Response, error) {
+	req, err := http.NewRequest(method, endpoint, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	for key, value := range headers {
+		req.Header.Add(key, value)
+	}
+
+	httpClient.logger.Inf(fmt.Sprintf("making http request %s %s", method, endpoint))
+	resp, err := httpClient.client.Do(req)
+	if err != nil {
+		httpClient.logger.Err("failed to make request")
+		return nil, err
+	}
+	httpClient.logger.Inf(fmt.Sprintf("resource responded with statusCode %d", resp.StatusCode))
+	respObj := Response(*resp)
+	return &respObj, nil
+
 }
 
 func (httpClient *HttpClient) actionBody(
