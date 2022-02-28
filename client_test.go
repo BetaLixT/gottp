@@ -1,33 +1,24 @@
 package main
 
 import (
+	"fmt"
 	"testing"
-
-	"github.com/google/go-cmp/cmp"
 )
 
-type Location struct {
-	PostCode            string  `json:"post code"`
-	Country             string  `json:"country"`
-	CountryAbbreviation string  `json:"country abbreviation"`
-	Places              []Place `json:"places"`
+type SampleResponse struct {
+	Response string `json:"response"`
+	Success  bool   `json:"success"`
 }
-type Place struct {
-	PlaceName         string `json:"place name"`
-	Longitude         string `json:"longitude"`
-	State             string `json:"state"`
-	StateAbbreviation string `json:"state abbreviation"`
-	Latitude          string `json:"latitude"`
-}
+
+var baseurl string = "https://betalixt-testapis.herokuapp.com"
 
 func TestGet(t *testing.T) {
 	httpClient := NewClient()
 
-	// - Testing 200
+	// - Testing 200 simple
 	resp, err := httpClient.Get(
 		map[string]string{},
-		"https://api.zippopotam.us/us/{}",
-		"90210",
+		fmt.Sprintf("%s/get", baseurl),
 	)
 	if err != nil {
 		t.Error("Request failed")
@@ -38,39 +29,51 @@ func TestGet(t *testing.T) {
 	if resp.StatusCode != 200 {
 		t.Errorf("Status code unexpected: %d", resp.StatusCode)
 	}
-	loc := Location{}
-	err = resp.Unmarshal(&loc)
+	res := SampleResponse{}
+	err = resp.Unmarshal(&res)
 	if err != nil {
 		t.Error("unmarshaling failed")
 		t.Error(err)
 		t.FailNow()
 	}
-	expct := Location{
-		PostCode:            "90210",
-		Country:             "United States",
-		CountryAbbreviation: "US",
-		Places: []Place{
-			{
-				PlaceName:         "Beverly Hills",
-				Longitude:         "-118.4065",
-				Latitude:          "34.0901",
-				State:             "California",
-				StateAbbreviation: "CA",
-			},
-		},
-	}
-	if !cmp.Equal(expct, loc) {
+	if !res.Success || res.Response != "Successful No body" {
 		t.Error("Response wasn't expected")
 		t.FailNow()
 	}
 
-	// - Testing 404
+	// - Testing 200 one path param
 	resp, err = httpClient.Get(
 		map[string]string{},
-		"https://api.zippopotam.us/us/{}",
-		"9021123",
+		fmt.Sprintf("%s/get/{}", baseurl),
+		"valid",
 	)
+	if err != nil {
+		t.Error("Request failed")
+		t.Error(err)
+		t.FailNow()
+	}
 
+	if resp.StatusCode != 200 {
+		t.Errorf("Status code unexpected: %d", resp.StatusCode)
+	}
+	res = SampleResponse{}
+	err = resp.Unmarshal(&res)
+	if err != nil {
+		t.Error("unmarshaling failed")
+		t.Error(err)
+		t.FailNow()
+	}
+	if !res.Success || res.Response != "Successful one param" {
+		t.Error("Response wasn't expected")
+		t.FailNow()
+	}
+
+	// - Testing 404 one path param
+	resp, err = httpClient.Get(
+		map[string]string{},
+		fmt.Sprintf("%s/get/{}", baseurl),
+		"missing",
+	)
 	if err != nil {
 		t.Error("Request failed")
 		t.Error(err)
@@ -79,5 +82,128 @@ func TestGet(t *testing.T) {
 
 	if resp.StatusCode != 404 {
 		t.Errorf("Status code unexpected: %d", resp.StatusCode)
+	}
+	res = SampleResponse{}
+	err = resp.Unmarshal(&res)
+	if err != nil {
+		t.Error("unmarshaling failed")
+		t.Error(err)
+		t.FailNow()
+	}
+	if res.Success || res.Response != "Unsuccessful one param" {
+		t.Error("Response wasn't expected")
+		t.FailNow()
+	}
+
+	// - Testing 200 one two param
+	resp, err = httpClient.Get(
+		map[string]string{},
+		fmt.Sprintf("%s/get/{}/var2/{}", baseurl),
+		"valid",
+		"valid",
+	)
+	if err != nil {
+		t.Error("Request failed")
+		t.Error(err)
+		t.FailNow()
+	}
+
+	if resp.StatusCode != 200 {
+		t.Errorf("Status code unexpected: %d", resp.StatusCode)
+	}
+	res = SampleResponse{}
+	err = resp.Unmarshal(&res)
+	if err != nil {
+		t.Error("unmarshaling failed")
+		t.Error(err)
+		t.FailNow()
+	}
+	if !res.Success || res.Response != "Successful two param" {
+		t.Error("Response wasn't expected")
+		t.FailNow()
+	}
+
+	// - Testing 404 two path param
+	resp, err = httpClient.Get(
+		map[string]string{},
+		fmt.Sprintf("%s/get/{}/var2/{}", baseurl),
+		"missing",
+		"valid",
+	)
+	if err != nil {
+		t.Error("Request failed")
+		t.Error(err)
+		t.FailNow()
+	}
+
+	if resp.StatusCode != 404 {
+		t.Errorf("Status code unexpected: %d", resp.StatusCode)
+	}
+	res = SampleResponse{}
+	err = resp.Unmarshal(&res)
+	if err != nil {
+		t.Error("unmarshaling failed")
+		t.Error(err)
+		t.FailNow()
+	}
+	if res.Success || res.Response != "Unsuccessful two param" {
+		t.Error("Response wasn't expected")
+		t.FailNow()
+	}
+
+	// - Testing 200 one two param and closing
+	resp, err = httpClient.Get(
+		map[string]string{},
+		fmt.Sprintf("%s/get/{}/var2/{}/closing", baseurl),
+		"valid",
+		"valid",
+	)
+	if err != nil {
+		t.Error("Request failed")
+		t.Error(err)
+		t.FailNow()
+	}
+
+	if resp.StatusCode != 200 {
+		t.Errorf("Status code unexpected: %d", resp.StatusCode)
+	}
+	res = SampleResponse{}
+	err = resp.Unmarshal(&res)
+	if err != nil {
+		t.Error("unmarshaling failed")
+		t.Error(err)
+		t.FailNow()
+	}
+	if !res.Success || res.Response != "Successful two param" {
+		t.Error("Response wasn't expected")
+		t.FailNow()
+	}
+
+	// - Testing 404 two path param and closing
+	resp, err = httpClient.Get(
+		map[string]string{},
+		fmt.Sprintf("%s/get/{}/var2/{}/closing", baseurl),
+		"valid",
+		"missing",
+	)
+	if err != nil {
+		t.Error("Request failed")
+		t.Error(err)
+		t.FailNow()
+	}
+
+	if resp.StatusCode != 404 {
+		t.Errorf("Status code unexpected: %d", resp.StatusCode)
+	}
+	res = SampleResponse{}
+	err = resp.Unmarshal(&res)
+	if err != nil {
+		t.Error("unmarshaling failed")
+		t.Error(err)
+		t.FailNow()
+	}
+	if res.Success || res.Response != "Unsuccessful two param" {
+		t.Error("Response wasn't expected")
+		t.FailNow()
 	}
 }
