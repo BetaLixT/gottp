@@ -17,12 +17,14 @@ type HttpClient struct {
 func (httpClient *HttpClient) Get(
 	headers map[string]string,
 	endpoint string,
+	qParam map[string][]string,
 	params ...string,
 ) (*Response, error) {
 	return httpClient.action(
 		"GET",
 		headers,
 		endpoint,
+		qParam,
 		params...,
 	)
 }
@@ -30,12 +32,14 @@ func (httpClient *HttpClient) Get(
 func (httpClient *HttpClient) Post(
 	headers map[string]string,
 	endpoint string,
+	qParam map[string][]string,
 	params ...string,
 ) (*Response, error) {
 	return httpClient.action(
 		"POST",
 		headers,
 		endpoint,
+		qParam,
 		params...,
 	)
 }
@@ -43,12 +47,14 @@ func (httpClient *HttpClient) Post(
 func (httpClient *HttpClient) Patch(
 	headers map[string]string,
 	endpoint string,
+	qParam map[string][]string,
 	params ...string,
 ) (*Response, error) {
 	return httpClient.action(
 		"PATCH",
 		headers,
 		endpoint,
+		qParam,
 		params...,
 	)
 }
@@ -56,12 +62,14 @@ func (httpClient *HttpClient) Patch(
 func (httpClient *HttpClient) Put(
 	headers map[string]string,
 	endpoint string,
+	qParam map[string][]string,
 	params ...string,
 ) (*Response, error) {
 	return httpClient.action(
 		"PUT",
 		headers,
 		endpoint,
+		qParam,
 		params...,
 	)
 }
@@ -69,12 +77,14 @@ func (httpClient *HttpClient) Put(
 func (httpClient *HttpClient) Delete(
 	headers map[string]string,
 	endpoint string,
+	qParam map[string][]string,
 	params ...string,
 ) (*Response, error) {
 	return httpClient.action(
 		"DELETE",
 		headers,
 		endpoint,
+		qParam,
 		params...,
 	)
 }
@@ -83,6 +93,7 @@ func (httpClient *HttpClient) PostBody(
 	headers map[string]string,
 	body interface{},
 	endpoint string,
+	qParam map[string][]string,
 	params ...string,
 ) (*Response, error) {
 	return httpClient.actionBody(
@@ -90,6 +101,7 @@ func (httpClient *HttpClient) PostBody(
 		headers,
 		body,
 		endpoint,
+		qParam,
 		params...,
 	)
 }
@@ -98,6 +110,7 @@ func (httpClient *HttpClient) PatchBody(
 	headers map[string]string,
 	body interface{},
 	endpoint string,
+	qParam map[string][]string,
 	params ...string,
 ) (*Response, error) {
 	return httpClient.actionBody(
@@ -105,6 +118,7 @@ func (httpClient *HttpClient) PatchBody(
 		headers,
 		body,
 		endpoint,
+		qParam,
 		params...,
 	)
 }
@@ -113,6 +127,7 @@ func (httpClient *HttpClient) PutBody(
 	headers map[string]string,
 	body interface{},
 	endpoint string,
+	qParam map[string][]string,
 	params ...string,
 ) (*Response, error) {
 	return httpClient.actionBody(
@@ -120,6 +135,7 @@ func (httpClient *HttpClient) PutBody(
 		headers,
 		body,
 		endpoint,
+		qParam,
 		params...,
 	)
 }
@@ -128,6 +144,7 @@ func (httpClient *HttpClient) DeleteBody(
 	headers map[string]string,
 	body interface{},
 	endpoint string,
+	qParam map[string][]string,
 	params ...string,
 ) (*Response, error) {
 	return httpClient.actionBody(
@@ -135,6 +152,7 @@ func (httpClient *HttpClient) DeleteBody(
 		headers,
 		body,
 		endpoint,
+		qParam,
 		params...,
 	)
 }
@@ -143,9 +161,10 @@ func (httpClient *HttpClient) action(
 	method string,
 	headers map[string]string,
 	endpoint string,
+	qParam map[string][]string,
 	pthParms ...string,
 ) (*Response, error) {
-	endpoint, err := formatEp(endpoint, pthParms...)
+	endpoint, err := formatEp(endpoint, qParam, pthParms...)
 	if err != nil {
 		return nil, err
 	}
@@ -175,9 +194,10 @@ func (httpClient *HttpClient) actionBody(
 	headers map[string]string,
 	body interface{},
 	endpoint string,
+	qParam map[string][]string,
 	pthParms ...string,
 ) (*Response, error) {
-	endpoint, err := formatEp(endpoint, pthParms...)
+	endpoint, err := formatEp(endpoint, qParam, pthParms...)
 	if err != nil {
 		return nil, err
 	}
@@ -208,8 +228,10 @@ func (httpClient *HttpClient) actionBody(
 	return &respObj, nil
 }
 
+// TODO Pre calculating length and allocating might improve performance
 func formatEp(
 	format string,
+	qParam map[string][]string,
 	pthParms ...string,
 ) (string, error) {
 	end := len(format)
@@ -245,6 +267,19 @@ func formatEp(
 	if prev < end {
 		buffer = append(buffer, format[prev:end]...)
 	}
+
+	// TODO could be done in parallel, performance needs to be tested
+	qryBuf := []byte("?")
+
+	for key, vals := range qParam {
+		esKey := url.QueryEscape(key)
+		for _, val := range vals {
+			// TODO just a spike, need to experiment
+			query := esKey + "=" + url.QueryEscape(val) + "&"
+			qryBuf = append(qryBuf, query...)
+		}
+	}
+	buffer = append(buffer, qryBuf...)
 	return string(buffer), nil
 }
 

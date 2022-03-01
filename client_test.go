@@ -19,6 +19,7 @@ func TestGet(t *testing.T) {
 	resp, err := httpClient.Get(
 		map[string]string{},
 		fmt.Sprintf("%s/get", baseurl),
+		nil,
 	)
 	if err != nil {
 		t.Error("Request failed")
@@ -45,6 +46,7 @@ func TestGet(t *testing.T) {
 	resp, err = httpClient.Get(
 		map[string]string{},
 		fmt.Sprintf("%s/get/{}", baseurl),
+		nil,
 		"valid",
 	)
 	if err != nil {
@@ -72,6 +74,7 @@ func TestGet(t *testing.T) {
 	resp, err = httpClient.Get(
 		map[string]string{},
 		fmt.Sprintf("%s/get/{}", baseurl),
+		nil,
 		"missing",
 	)
 	if err != nil {
@@ -99,6 +102,7 @@ func TestGet(t *testing.T) {
 	resp, err = httpClient.Get(
 		map[string]string{},
 		fmt.Sprintf("%s/get/{}/var2/{}", baseurl),
+		nil,
 		"valid",
 		"valid",
 	)
@@ -127,6 +131,7 @@ func TestGet(t *testing.T) {
 	resp, err = httpClient.Get(
 		map[string]string{},
 		fmt.Sprintf("%s/get/{}/var2/{}", baseurl),
+		nil,
 		"missing",
 		"valid",
 	)
@@ -155,6 +160,7 @@ func TestGet(t *testing.T) {
 	resp, err = httpClient.Get(
 		map[string]string{},
 		fmt.Sprintf("%s/get/{}/var2/{}/closing", baseurl),
+		nil,
 		"valid",
 		"valid",
 	)
@@ -183,6 +189,7 @@ func TestGet(t *testing.T) {
 	resp, err = httpClient.Get(
 		map[string]string{},
 		fmt.Sprintf("%s/get/{}/var2/{}/closing", baseurl),
+		nil,
 		"valid",
 		"missing",
 	)
@@ -203,6 +210,60 @@ func TestGet(t *testing.T) {
 		t.FailNow()
 	}
 	if res.Success || res.Response != "Unsuccessful two param" {
+		t.Error("Response wasn't expected")
+		t.FailNow()
+	}
+
+	// - Testing 200 one qpam
+	resp, err = httpClient.Get(
+		map[string]string{},
+		fmt.Sprintf("%s/get/oq", baseurl),
+		map[string][]string{"var0": {"valid"}},
+	)
+	if err != nil {
+		t.Error("Request failed")
+		t.Error(err)
+		t.FailNow()
+	}
+
+	if resp.StatusCode != 200 {
+		t.Errorf("Status code unexpected: %d", resp.StatusCode)
+	}
+	res = SampleResponse{}
+	err = resp.Unmarshal(&res)
+	if err != nil {
+		t.Error("unmarshaling failed")
+		t.Error(err)
+		t.FailNow()
+	}
+	if !res.Success || res.Response != "Successful No body one query" {
+		t.Error("Response wasn't expected")
+		t.FailNow()
+	}
+
+	// - Testing 200 one qpam
+	resp, err = httpClient.Get(
+		map[string]string{},
+		fmt.Sprintf("%s/get/tq", baseurl),
+		map[string][]string{"var0": {"valid"}, "var1": {"valid"}},
+	)
+	if err != nil {
+		t.Error("Request failed")
+		t.Error(err)
+		t.FailNow()
+	}
+
+	if resp.StatusCode != 200 {
+		t.Errorf("Status code unexpected: %d", resp.StatusCode)
+	}
+	res = SampleResponse{}
+	err = resp.Unmarshal(&res)
+	if err != nil {
+		t.Error("unmarshaling failed")
+		t.Error(err)
+		t.FailNow()
+	}
+	if !res.Success || res.Response != "Successful No body two query" {
 		t.Error("Response wasn't expected")
 		t.FailNow()
 	}
