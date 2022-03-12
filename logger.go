@@ -1,4 +1,4 @@
-package main
+package gottp
 
 type ILogger interface {
 	Inf(string)

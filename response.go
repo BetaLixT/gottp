@@ -1,4 +1,4 @@
-package main
+package gottp
 
 import (
 	"encoding/json"
