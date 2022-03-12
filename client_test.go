@@ -267,4 +267,34 @@ func TestGet(t *testing.T) {
 		t.Error("Response wasn't expected")
 		t.FailNow()
 	}
+
+	// - Testing 200 POST one form
+	resp, err = httpClient.PostForm(
+		nil,
+		map[string][]string{
+			"var0": {"valid"},
+		},
+		fmt.Sprintf("%s/post/form/{}", baseurl),
+		nil,
+		"valid",
+	)
+	if err != nil {
+		t.Error("unmarshaling failed")
+		t.Error(err)
+		t.FailNow()
+	}
+
+	if resp.StatusCode != 200 {
+		t.Errorf("Status code unexpected: %d", resp.StatusCode)
+	}
+	err = resp.Unmarshal(&res)
+	if err != nil {
+		t.Error("unmarshaling failed")
+		t.Error(err)
+		t.FailNow()
+	}
+	if !res.Success || res.Response != "Successful Form One Param" {
+		t.Error("Response wasn't expected")
+		t.FailNow()
+	}
 }
