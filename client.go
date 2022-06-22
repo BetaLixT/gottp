@@ -6,23 +6,29 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
+	"time"
 
-	"github.com/betalixt/gottp/logger"
+	hlpr "github.com/BetaLixT/gottp/helpers"
 )
 
 type HttpClient struct {
-	client http.Client
-	logger ILogger
+	client  http.Client
+	tracer  ITracer
+	headers map[string]string
+	tid     string
+	pid     string
+	flg     string
 }
 
-func (httpClient *HttpClient) Get(
+func (HttpClient *HttpClient) Get(
 	headers map[string]string,
 	endpoint string,
 	qParam map[string][]string,
 	params ...string,
 ) (*Response, error) {
-	return httpClient.action(
+	return HttpClient.action(
 		"GET",
 		headers,
 		endpoint,
@@ -31,13 +37,13 @@ func (httpClient *HttpClient) Get(
 	)
 }
 
-func (httpClient *HttpClient) Post(
+func (HttpClient *HttpClient) Post(
 	headers map[string]string,
 	endpoint string,
 	qParam map[string][]string,
 	params ...string,
 ) (*Response, error) {
-	return httpClient.action(
+	return HttpClient.action(
 		"POST",
 		headers,
 		endpoint,
@@ -46,13 +52,13 @@ func (httpClient *HttpClient) Post(
 	)
 }
 
-func (httpClient *HttpClient) Patch(
+func (HttpClient *HttpClient) Patch(
 	headers map[string]string,
 	endpoint string,
 	qParam map[string][]string,
 	params ...string,
 ) (*Response, error) {
-	return httpClient.action(
+	return HttpClient.action(
 		"PATCH",
 		headers,
 		endpoint,
@@ -61,13 +67,13 @@ func (httpClient *HttpClient) Patch(
 	)
 }
 
-func (httpClient *HttpClient) Put(
+func (HttpClient *HttpClient) Put(
 	headers map[string]string,
 	endpoint string,
 	qParam map[string][]string,
 	params ...string,
 ) (*Response, error) {
-	return httpClient.action(
+	return HttpClient.action(
 		"PUT",
 		headers,
 		endpoint,
@@ -76,13 +82,13 @@ func (httpClient *HttpClient) Put(
 	)
 }
 
-func (httpClient *HttpClient) Delete(
+func (HttpClient *HttpClient) Delete(
 	headers map[string]string,
 	endpoint string,
 	qParam map[string][]string,
 	params ...string,
 ) (*Response, error) {
-	return httpClient.action(
+	return HttpClient.action(
 		"DELETE",
 		headers,
 		endpoint,
@@ -91,133 +97,126 @@ func (httpClient *HttpClient) Delete(
 	)
 }
 
-func (httpClient *HttpClient) PostBody(
+func (HttpClient *HttpClient) PostBody(
 	headers map[string]string,
 	body interface{},
 	endpoint string,
 	qParam map[string][]string,
 	params ...string,
 ) (*Response, error) {
-	return httpClient.actionBody(
+	return HttpClient.actionBody(
 		"POST",
 		headers,
 		body,
 		endpoint,
-		qParam,
-		params...,
+		qParam, params...,
 	)
 }
 
-func (httpClient *HttpClient) PatchBody(
+func (HttpClient *HttpClient) PatchBody(
 	headers map[string]string,
 	body interface{},
 	endpoint string,
 	qParam map[string][]string,
 	params ...string,
 ) (*Response, error) {
-	return httpClient.actionBody(
+	return HttpClient.actionBody(
 		"PATCH",
 		headers,
 		body,
 		endpoint,
-		qParam,
-		params...,
+		qParam, params...,
 	)
 }
 
-func (httpClient *HttpClient) PutBody(
+func (HttpClient *HttpClient) PutBody(
 	headers map[string]string,
 	body interface{},
 	endpoint string,
 	qParam map[string][]string,
 	params ...string,
 ) (*Response, error) {
-	return httpClient.actionBody(
+	return HttpClient.actionBody(
 		"PUT",
 		headers,
 		body,
 		endpoint,
-		qParam,
-		params...,
+		qParam, params...,
 	)
 }
 
-func (httpClient *HttpClient) DeleteBody(
+func (HttpClient *HttpClient) DeleteBody(
 	headers map[string]string,
 	body interface{},
 	endpoint string,
 	qParam map[string][]string,
 	params ...string,
 ) (*Response, error) {
-	return httpClient.actionBody(
+	return HttpClient.actionBody(
 		"DELETE",
 		headers,
 		body,
 		endpoint,
-		qParam,
-		params...,
+		qParam, params...,
 	)
 }
 
-func (httpClient *HttpClient) PostForm(
+func (HttpClient *HttpClient) PostForm(
 	headers map[string]string,
 	form url.Values,
 	endpoint string,
 	qParam map[string][]string,
 	params ...string,
 ) (*Response, error) {
-	return httpClient.actionForm(
+	return HttpClient.actionForm(
 		"POST",
 		headers,
 		form,
 		endpoint,
-		qParam,
-		params...,
+		qParam, params...,
 	)
 }
 
-func (httpClient *HttpClient) PatchForm(
+func (HttpClient *HttpClient) PatchForm(
 	headers map[string]string,
 	form url.Values,
 	endpoint string,
 	qParam map[string][]string,
 	params ...string,
 ) (*Response, error) {
-	return httpClient.actionForm(
+	return HttpClient.actionForm(
 		"PATCH",
 		headers,
 		form,
 		endpoint,
-		qParam,
-		params...,
+		qParam, params...,
 	)
 }
 
-func (httpClient *HttpClient) PutForm(
+func (HttpClient *HttpClient) PutForm(
 	headers map[string]string,
 	form url.Values,
 	endpoint string,
 	qParam map[string][]string,
 	params ...string,
 ) (*Response, error) {
-	return httpClient.actionForm(
+	return HttpClient.actionForm(
 		"PUT",
 		headers,
 		form,
 		endpoint,
-		qParam,
-		params...,
+		qParam, params...,
 	)
 }
 
-func (httpClient *HttpClient) DeleteForm(
+func (HttpClient *HttpClient) DeleteForm(
 	headers map[string]string,
 	form url.Values,
 	endpoint string,
 	qParam map[string][]string,
 	params ...string,
 ) (*Response, error) {
-	return httpClient.actionForm(
+	return HttpClient.actionForm(
 		"DELETE",
 		headers,
 		form,
@@ -227,7 +226,7 @@ func (httpClient *HttpClient) DeleteForm(
 	)
 }
 
-func (httpClient *HttpClient) action(
+func (HttpClient *HttpClient) action(
 	method string,
 	headers map[string]string,
 	endpoint string,
@@ -243,22 +242,17 @@ func (httpClient *HttpClient) action(
 		return nil, err
 	}
 
-	for key, value := range headers {
-		req.Header.Add(key, value)
-	}
+	HttpClient.formHeaders(req, headers)
 
-	httpClient.logger.Inf(fmt.Sprintf("making http request %s %s", method, endpoint))
-	resp, err := httpClient.client.Do(req)
+	resp, err := HttpClient.runRequest(req)
 	if err != nil {
-		httpClient.logger.Err("failed to make request")
 		return nil, err
 	}
-	httpClient.logger.Inf(fmt.Sprintf("resource responded with statusCode %d", resp.StatusCode))
 	respObj := Response(*resp)
 	return &respObj, nil
 }
 
-func (httpClient *HttpClient) actionBody(
+func (HttpClient *HttpClient) actionBody(
 	method string,
 	headers map[string]string,
 	body interface{},
@@ -273,7 +267,6 @@ func (httpClient *HttpClient) actionBody(
 
 	byts, err := json.Marshal(body)
 	if err != nil {
-		httpClient.logger.Err("failed to marshal body")
 		return nil, err
 	}
 
@@ -282,22 +275,18 @@ func (httpClient *HttpClient) actionBody(
 		return nil, err
 	}
 
-	for key, value := range headers {
-		req.Header.Add(key, value)
-	}
+	HttpClient.formHeaders(req, headers)
+	req.Header.Set("Content-Type", "application/json")
 
-	httpClient.logger.Inf(fmt.Sprintf("making http request %s %s", method, endpoint))
-	resp, err := httpClient.client.Do(req)
+	resp, err := HttpClient.runRequest(req)
 	if err != nil {
-		httpClient.logger.Err("failed to make request")
 		return nil, err
 	}
-	httpClient.logger.Inf(fmt.Sprintf("resource responded with statusCode %d", resp.StatusCode))
 	respObj := Response(*resp)
 	return &respObj, nil
 }
 
-func (httpClient *HttpClient) actionForm(
+func (HttpClient *HttpClient) actionForm(
 	method string,
 	headers map[string]string,
 	form url.Values,
@@ -309,25 +298,93 @@ func (httpClient *HttpClient) actionForm(
 	if err != nil {
 		return nil, err
 	}
-	req, err := http.NewRequest(method, endpoint, strings.NewReader(form.Encode()))
+	req, err := http.NewRequest(
+		method,
+		endpoint,
+		strings.NewReader(form.Encode()),
+	)
 	if err != nil {
 		return nil, err
 	}
+
+	HttpClient.formHeaders(req, headers)
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
+	resp, err := HttpClient.runRequest(req)
+	if err != nil {
+		return nil, err
+	}
+	respObj := Response(*resp)
+	return &respObj, nil
+}
+
+func (HttpClient *HttpClient) formHeaders(
+	req *http.Request,
+	headers map[string]string,
+) {
+	for key, value := range HttpClient.headers {
+		req.Header.Add(key, value)
+	}
 	for key, value := range headers {
 		req.Header.Add(key, value)
 	}
+}
 
-	httpClient.logger.Inf(fmt.Sprintf("making http request %s %s", method, endpoint))
-	resp, err := httpClient.client.Do(req)
+func (HttpClient *HttpClient) runRequest(
+	req *http.Request,
+) (*http.Response, error) {
+	sid, err := hlpr.GenerateParentId()
+	if err == nil {
+		req.Header.Add(
+			"traceparent",
+			fmt.Sprintf("00-%s-%s-%s", HttpClient.tid, sid, HttpClient.flg),
+		)
+	} else {
+		req.Header.Add(
+			"traceparent",
+			fmt.Sprintf(
+				"00-%s-%s-%s",
+				HttpClient.tid,
+				HttpClient.pid,
+				HttpClient.flg,
+			),
+		)
+	}
+	start := time.Now()
+	resp, err := HttpClient.client.Do(req)
+	end := time.Now()
+
 	if err != nil {
-		httpClient.logger.Err("failed to make request")
+		HttpClient.tracer.TraceDependency(
+			sid,
+			"http",
+			req.URL.Hostname(),
+			fmt.Sprintf("%s %s", req.Method, req.URL.RequestURI()),
+			false,
+			start,
+			end,
+			// types.NewField("method", req.Method),
+			// types.NewField("error", err.Error()),
+			map[string]string{"method": req.Method, "error": err.Error()},
+		)
 		return nil, err
 	}
-	httpClient.logger.Inf(fmt.Sprintf("resource responded with statusCode %d", resp.StatusCode))
-	respObj := Response(*resp)
-	return &respObj, nil
+	HttpClient.tracer.TraceDependency(
+		sid,
+		"http",
+		req.URL.Hostname(),
+		fmt.Sprintf("%s %s", req.Method, req.URL.RequestURI()),
+		resp.StatusCode > 199 && resp.StatusCode < 300,
+		start,
+		end,
+		// types.NewField("method", req.Method),
+		// types.NewField("statusCode", strconv.Itoa(resp.StatusCode)),
+		map[string]string{
+			"method": req.Method,
+			"statusCode": strconv.Itoa(resp.StatusCode),
+		},
+	)
+	return resp, err
 }
 
 // TODO Pre calculating length and allocating might improve performance
@@ -371,7 +428,8 @@ func formatEp(
 	}
 
 	// TODO could be done in parallel, performance needs to be tested
-	// TODO found out that url.Values has an Encode funtion that does this, need to test
+	// TODO found out that url.Values has an Encode funtion that does this,
+	//      need to test
 	qryBuf := []byte("?")
 
 	for key, vals := range qParam {
@@ -387,10 +445,21 @@ func formatEp(
 }
 
 // - "Constructors"
-func NewClient() *HttpClient {
-	client := HttpClient{
-		client: *http.DefaultClient,
-		logger: logger.NewDefaultLogger(),
+func NewHttpClientProvider(
+	tracer ITracer,
+	headers map[string]string,
+	tid string,
+	pid string,
+	flg string,
+) *HttpClient {
+	return &HttpClient{
+		client:  *http.DefaultClient,
+		tracer:  tracer,
+		headers: headers,
+		tid:     tid,
+		pid:     pid,
+		flg:     flg,
 	}
-	return &client
 }
+
+//-------
