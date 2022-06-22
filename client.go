@@ -22,59 +22,217 @@ type HttpClient struct {
 	flg     string
 }
 
-func (HttpClient *HttpClient) Get(headers map[string]string, endpoint string, qParam map[string][]string, params ...string) (*Response, error) {
-	return HttpClient.action("GET", headers, endpoint, qParam, params...)
+func (HttpClient *HttpClient) Get(
+	headers map[string]string,
+	endpoint string,
+	qParam map[string][]string,
+	params ...string,
+) (*Response, error) {
+	return HttpClient.action(
+		"GET",
+		headers,
+		endpoint,
+		qParam,
+		params...,
+	)
 }
 
-func (HttpClient *HttpClient) Post(headers map[string]string, endpoint string, qParam map[string][]string, params ...string) (*Response, error) {
-	return HttpClient.action("POST", headers, endpoint, qParam, params...)
+func (HttpClient *HttpClient) Post(
+	headers map[string]string,
+	endpoint string,
+	qParam map[string][]string,
+	params ...string,
+) (*Response, error) {
+	return HttpClient.action(
+		"POST",
+		headers,
+		endpoint,
+		qParam,
+		params...,
+	)
 }
 
-func (HttpClient *HttpClient) Patch(headers map[string]string, endpoint string, qParam map[string][]string, params ...string) (*Response, error) {
-	return HttpClient.action("PATCH", headers, endpoint, qParam, params...)
+func (HttpClient *HttpClient) Patch(
+	headers map[string]string,
+	endpoint string,
+	qParam map[string][]string,
+	params ...string,
+) (*Response, error) {
+	return HttpClient.action(
+		"PATCH",
+		headers,
+		endpoint,
+		qParam,
+		params...,
+	)
 }
 
-func (HttpClient *HttpClient) Put(headers map[string]string, endpoint string, qParam map[string][]string, params ...string) (*Response, error) {
-	return HttpClient.action("PUT", headers, endpoint, qParam, params...)
+func (HttpClient *HttpClient) Put(
+	headers map[string]string,
+	endpoint string,
+	qParam map[string][]string,
+	params ...string,
+) (*Response, error) {
+	return HttpClient.action(
+		"PUT",
+		headers,
+		endpoint,
+		qParam,
+		params...,
+	)
 }
 
-func (HttpClient *HttpClient) Delete(headers map[string]string, endpoint string, qParam map[string][]string, params ...string) (*Response, error) {
-	return HttpClient.action("DELETE", headers, endpoint, qParam, params...)
+func (HttpClient *HttpClient) Delete(
+	headers map[string]string,
+	endpoint string,
+	qParam map[string][]string,
+	params ...string,
+) (*Response, error) {
+	return HttpClient.action(
+		"DELETE",
+		headers,
+		endpoint,
+		qParam,
+		params...,
+	)
 }
 
-func (HttpClient *HttpClient) PostBody(headers map[string]string, body interface{}, endpoint string, qParam map[string][]string, params ...string) (*Response, error) {
-	return HttpClient.actionBody("POST", headers, body, endpoint, qParam, params...)
+func (HttpClient *HttpClient) PostBody(
+	headers map[string]string,
+	body interface{},
+	endpoint string,
+	qParam map[string][]string,
+	params ...string,
+) (*Response, error) {
+	return HttpClient.actionBody(
+		"POST",
+		headers,
+		body,
+		endpoint,
+		qParam, params...,
+	)
 }
 
-func (HttpClient *HttpClient) PatchBody(headers map[string]string, body interface{}, endpoint string, qParam map[string][]string, params ...string) (*Response, error) {
-	return HttpClient.actionBody("PATCH", headers, body, endpoint, qParam, params...)
+func (HttpClient *HttpClient) PatchBody(
+	headers map[string]string,
+	body interface{},
+	endpoint string,
+	qParam map[string][]string,
+	params ...string,
+) (*Response, error) {
+	return HttpClient.actionBody(
+		"PATCH",
+		headers,
+		body,
+		endpoint,
+		qParam, params...,
+	)
 }
 
-func (HttpClient *HttpClient) PutBody(headers map[string]string, body interface{}, endpoint string, qParam map[string][]string, params ...string) (*Response, error) {
-	return HttpClient.actionBody("PUT", headers, body, endpoint, qParam, params...)
+func (HttpClient *HttpClient) PutBody(
+	headers map[string]string,
+	body interface{},
+	endpoint string,
+	qParam map[string][]string,
+	params ...string,
+) (*Response, error) {
+	return HttpClient.actionBody(
+		"PUT",
+		headers,
+		body,
+		endpoint,
+		qParam, params...,
+	)
 }
 
-func (HttpClient *HttpClient) DeleteBody(headers map[string]string, body interface{}, endpoint string, qParam map[string][]string, params ...string) (*Response, error) {
-	return HttpClient.actionBody("DELETE", headers, body, endpoint, qParam, params...)
+func (HttpClient *HttpClient) DeleteBody(
+	headers map[string]string,
+	body interface{},
+	endpoint string,
+	qParam map[string][]string,
+	params ...string,
+) (*Response, error) {
+	return HttpClient.actionBody(
+		"DELETE",
+		headers,
+		body,
+		endpoint,
+		qParam, params...,
+	)
 }
 
-func (HttpClient *HttpClient) PostForm(headers map[string]string, form url.Values, endpoint string, qParam map[string][]string, params ...string) (*Response, error) {
-	return HttpClient.actionForm("POST", headers, form, endpoint, qParam, params...)
+func (HttpClient *HttpClient) PostForm(
+	headers map[string]string,
+	form url.Values,
+	endpoint string,
+	qParam map[string][]string,
+	params ...string,
+) (*Response, error) {
+	return HttpClient.actionForm(
+		"POST",
+		headers,
+		form,
+		endpoint,
+		qParam, params...,
+	)
 }
 
-func (HttpClient *HttpClient) PatchForm(headers map[string]string, form url.Values, endpoint string, qParam map[string][]string, params ...string) (*Response, error) {
-	return HttpClient.actionForm("PATCH", headers, form, endpoint, qParam, params...)
+func (HttpClient *HttpClient) PatchForm(
+	headers map[string]string,
+	form url.Values,
+	endpoint string,
+	qParam map[string][]string,
+	params ...string,
+) (*Response, error) {
+	return HttpClient.actionForm(
+		"PATCH",
+		headers,
+		form,
+		endpoint,
+		qParam, params...,
+	)
 }
 
-func (HttpClient *HttpClient) PutForm(headers map[string]string, form url.Values, endpoint string, qParam map[string][]string, params ...string) (*Response, error) {
-	return HttpClient.actionForm("PUT", headers, form, endpoint, qParam, params...)
+func (HttpClient *HttpClient) PutForm(
+	headers map[string]string,
+	form url.Values,
+	endpoint string,
+	qParam map[string][]string,
+	params ...string,
+) (*Response, error) {
+	return HttpClient.actionForm(
+		"PUT",
+		headers,
+		form,
+		endpoint,
+		qParam, params...,
+	)
 }
 
-func (HttpClient *HttpClient) DeleteForm(headers map[string]string, form url.Values, endpoint string, qParam map[string][]string, params ...string) (*Response, error) {
-	return HttpClient.actionForm("DELETE", headers, form, endpoint, qParam, params...)
+func (HttpClient *HttpClient) DeleteForm(
+	headers map[string]string,
+	form url.Values,
+	endpoint string,
+	qParam map[string][]string,
+	params ...string,
+) (*Response, error) {
+	return HttpClient.actionForm(
+		"DELETE",
+		headers,
+		form,
+		endpoint,
+		qParam,
+		params...,
+	)
 }
 
-func (HttpClient *HttpClient) action(method string, headers map[string]string, endpoint string, qParam map[string][]string, pthParms ...string) (*Response, error) {
+func (HttpClient *HttpClient) action(
+	method string,
+	headers map[string]string,
+	endpoint string,
+	qParam map[string][]string,
+	pthParms ...string,
+) (*Response, error) {
 	endpoint, err := formatEp(endpoint, qParam, pthParms...)
 	if err != nil {
 		return nil, err
@@ -94,7 +252,14 @@ func (HttpClient *HttpClient) action(method string, headers map[string]string, e
 	return &respObj, nil
 }
 
-func (HttpClient *HttpClient) actionBody(method string, headers map[string]string, body interface{}, endpoint string, qParam map[string][]string, pthParms ...string) (*Response, error) {
+func (HttpClient *HttpClient) actionBody(
+	method string,
+	headers map[string]string,
+	body interface{},
+	endpoint string,
+	qParam map[string][]string,
+	pthParms ...string,
+) (*Response, error) {
 	endpoint, err := formatEp(endpoint, qParam, pthParms...)
 	if err != nil {
 		return nil, err
@@ -121,7 +286,14 @@ func (HttpClient *HttpClient) actionBody(method string, headers map[string]strin
 	return &respObj, nil
 }
 
-func (HttpClient *HttpClient) actionForm(method string, headers map[string]string, form url.Values, endpoint string, qParam map[string][]string, pthParms ...string) (*Response, error) {
+func (HttpClient *HttpClient) actionForm(
+	method string,
+	headers map[string]string,
+	form url.Values,
+	endpoint string,
+	qParam map[string][]string,
+	pthParms ...string,
+) (*Response, error) {
 	endpoint, err := formatEp(endpoint, qParam, pthParms...)
 	if err != nil {
 		return nil, err
@@ -146,7 +318,10 @@ func (HttpClient *HttpClient) actionForm(method string, headers map[string]strin
 	return &respObj, nil
 }
 
-func (HttpClient *HttpClient) formHeaders(req *http.Request, headers map[string]string) {
+func (HttpClient *HttpClient) formHeaders(
+	req *http.Request,
+	headers map[string]string,
+) {
 	for key, value := range HttpClient.headers {
 		req.Header.Add(key, value)
 	}
@@ -155,7 +330,9 @@ func (HttpClient *HttpClient) formHeaders(req *http.Request, headers map[string]
 	}
 }
 
-func (HttpClient *HttpClient) runRequest(req *http.Request) (*http.Response, error) {
+func (HttpClient *HttpClient) runRequest(
+	req *http.Request,
+) (*http.Response, error) {
 	sid, err := hlpr.GenerateParentId()
 	if err == nil {
 		req.Header.Add(
@@ -165,7 +342,12 @@ func (HttpClient *HttpClient) runRequest(req *http.Request) (*http.Response, err
 	} else {
 		req.Header.Add(
 			"traceparent",
-			fmt.Sprintf("00-%s-%s-%s", HttpClient.tid, HttpClient.pid, HttpClient.flg),
+			fmt.Sprintf(
+				"00-%s-%s-%s",
+				HttpClient.tid,
+				HttpClient.pid,
+				HttpClient.flg,
+			),
 		)
 	}
 	start := time.Now()
@@ -197,13 +379,20 @@ func (HttpClient *HttpClient) runRequest(req *http.Request) (*http.Response, err
 		end,
 		// types.NewField("method", req.Method),
 		// types.NewField("statusCode", strconv.Itoa(resp.StatusCode)),
-		map[string]string{"method": req.Method, "statusCode": strconv.Itoa(resp.StatusCode)},
+		map[string]string{
+			"method": req.Method,
+			"statusCode": strconv.Itoa(resp.StatusCode),
+		},
 	)
 	return resp, err
 }
 
 // TODO Pre calculating length and allocating might improve performance
-func formatEp(format string, qParam url.Values, pthParms ...string) (string, error) {
+func formatEp(
+	format string,
+	qParam url.Values,
+	pthParms ...string,
+) (string, error) {
 	end := len(format)
 	prmCnt := len(pthParms)
 	pthNum := 0
@@ -256,7 +445,13 @@ func formatEp(format string, qParam url.Values, pthParms ...string) (string, err
 }
 
 // - "Constructors"
-func NewHttpClientProvider(tracer ITracer, headers map[string]string, tid string, pid string, flg string) *HttpClient {
+func NewHttpClientProvider(
+	tracer ITracer,
+	headers map[string]string,
+	tid string,
+	pid string,
+	flg string,
+) *HttpClient {
 	return &HttpClient{
 		client:  *http.DefaultClient,
 		tracer:  tracer,
@@ -265,7 +460,6 @@ func NewHttpClientProvider(tracer ITracer, headers map[string]string, tid string
 		pid:     pid,
 		flg:     flg,
 	}
-
 }
 
 //-------
