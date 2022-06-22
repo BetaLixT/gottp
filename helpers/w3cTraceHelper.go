@@ -82,7 +82,9 @@ func GenerateNewTraceparent(sampled bool) (string, error) {
 	), nil
 }
 
-func ParseTraceparentRaw(traceparent string) ([]byte, []byte, []byte, []byte, error) {
+func ParseTraceparentRaw(
+	traceparent string,
+) ([]byte, []byte, []byte, []byte, error) {
 	values := strings.Split(traceparent, "-")
 	if len(values) != 4 {
 		return nil, nil, nil, nil, fmt.Errorf(INVALID_VALUE_COUNT)
@@ -123,7 +125,9 @@ func ParseTraceparentRaw(traceparent string) ([]byte, []byte, []byte, []byte, er
 	return vers, tid, pid, flg, nil
 }
 
-func ParseTraceparent(traceparent string) (string, string, string, string, error) {
+func ParseTraceparent(
+	traceparent string,
+) (string, string, string, string, error) {
 	values := strings.Split(traceparent, "-")
 	if len(values) != 4 {
 		return "", "", "", "", fmt.Errorf(INVALID_VALUE_COUNT)
