@@ -20,6 +20,7 @@ type HttpClient struct {
 	tid     string
 	pid     string
 	flg     string
+	optn    *ClientOptions
 }
 
 func (HttpClient *HttpClient) Get(
@@ -226,6 +227,20 @@ func (HttpClient *HttpClient) DeleteForm(
 	)
 }
 
+func (client *HttpClient) WithOptions(
+	optn *ClientOptions,
+) *HttpClient{
+	return &HttpClient{
+		client:  client.client,
+		tracer:  client.tracer,
+		headers: client.headers,
+		tid:     client.tid,
+		pid:     client.pid,
+		flg:     client.flg,
+		optn:    optn,
+	}
+}
+
 func (HttpClient *HttpClient) action(
 	method string,
 	headers map[string]string,
@@ -427,7 +442,6 @@ func formatEp(
 		buffer = append(buffer, format[prev:end]...)
 	}
 
-	// TODO could be done in parallel, performance needs to be tested
 	// TODO found out that url.Values has an Encode funtion that does this,
 	//      need to test
 	qryBuf := []byte("?")
@@ -459,6 +473,7 @@ func NewHttpClientProvider(
 		tid:     tid,
 		pid:     pid,
 		flg:     flg,
+		optn:    DefaultOptions(),
 	}
 }
 
