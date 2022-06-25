@@ -3,6 +3,7 @@ package gottp
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -10,16 +11,19 @@ import (
 	"strings"
 	"time"
 
+	"github.com/BetaLixT/go-resiliency/retrier"
 	hlpr "github.com/BetaLixT/gottp/helpers"
 )
 
 type HttpClient struct {
-	client  http.Client
+	client  IInternalClient
 	tracer  ITracer
 	headers map[string]string
 	tid     string
 	pid     string
 	flg     string
+	optn    *ClientOptions
+	retr    *retrier.Retrier
 }
 
 func (HttpClient *HttpClient) Get(
@@ -226,6 +230,27 @@ func (HttpClient *HttpClient) DeleteForm(
 	)
 }
 
+func (client *HttpClient) WithOptions(
+	optn *ClientOptions,
+) *HttpClient{
+	return &HttpClient{
+		client:  client.client,
+		tracer:  client.tracer,
+		headers: client.headers,
+		tid:     client.tid,
+		pid:     client.pid,
+		flg:     client.flg,
+		optn:    optn,
+	  retr:    retrier.New(
+			retrier.ExponentialBackoff(
+				optn.Retry.RetryCount,
+				optn.Retry.InitialBackoff,
+			),
+			retrier.DefaultClassifier{},
+		),
+	}
+}
+
 func (HttpClient *HttpClient) action(
 	method string,
 	headers map[string]string,
@@ -351,7 +376,22 @@ func (HttpClient *HttpClient) runRequest(
 		)
 	}
 	start := time.Now()
-	resp, err := HttpClient.client.Do(req)
+	var resp *http.Response
+	if HttpClient.optn.Retry.Enabled {
+		HttpClient.retr.Run(func() error {
+			resp, err = HttpClient.client.Do(req)
+			if err == nil && resp.StatusCode > 299 {
+				for _, val := range HttpClient.optn.Retry.RetriableCodes {
+					if resp.StatusCode == val {
+						return errors.New("")
+					}
+				}
+			}
+			return nil
+		})
+	} else {
+    resp, err = HttpClient.client.Do(req)
+	}
 	end := time.Now()
 
 	if err != nil {
@@ -427,7 +467,6 @@ func formatEp(
 		buffer = append(buffer, format[prev:end]...)
 	}
 
-	// TODO could be done in parallel, performance needs to be tested
 	// TODO found out that url.Values has an Encode funtion that does this,
 	//      need to test
 	qryBuf := []byte("?")
@@ -452,13 +491,49 @@ func NewHttpClientProvider(
 	pid string,
 	flg string,
 ) *HttpClient {
+	optn := DefaultOptions()
 	return &HttpClient{
-		client:  *http.DefaultClient,
+		client:  http.DefaultClient,
 		tracer:  tracer,
 		headers: headers,
 		tid:     tid,
 		pid:     pid,
 		flg:     flg,
+		optn:    optn,
+		retr:    retrier.New(
+			retrier.ExponentialBackoff(
+				optn.Retry.RetryCount,
+				optn.Retry.InitialBackoff,
+			),
+			retrier.DefaultClassifier{},
+		),
+	}
+}
+
+func NewHttpClientWithClientProvider(
+	client IInternalClient,
+	tracer ITracer,
+	headers map[string]string,
+	tid string,
+	pid string,
+	flg string,
+) *HttpClient {
+	optn := DefaultOptions()
+	return &HttpClient{
+		client:  client,
+		tracer:  tracer,
+		headers: headers,
+		tid:     tid,
+		pid:     pid,
+		flg:     flg,
+		optn:    optn,
+		retr:    retrier.New(
+			retrier.ExponentialBackoff(
+				optn.Retry.RetryCount,
+				optn.Retry.InitialBackoff,
+			),
+			retrier.DefaultClassifier{},
+		),
 	}
 }
 
