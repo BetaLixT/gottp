@@ -1,5 +1,7 @@
 package gottp
 
+import "time"
+
 type ClientOptions struct {
   Retry RetryPolicy
 }
@@ -7,6 +9,8 @@ type ClientOptions struct {
 type RetryPolicy struct {
 	Enabled        bool
 	RetriableCodes []int
+	RetryCount     int
+	InitialBackoff time.Duration
 }
 
 func DefaultOptions() *ClientOptions {
@@ -20,6 +24,8 @@ func DefaultOptions() *ClientOptions {
         503,
         504,
       },
+      RetryCount: 5,
+      InitialBackoff: 100 * time.Millisecond,
     },
   }
 }

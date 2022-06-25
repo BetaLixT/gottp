@@ -2,7 +2,12 @@ package gottp
 
 import (
 	"time"
+	"net/http"
 )
+
+type IInternalClient interface {
+	Do (*http.Request) (*http.Response, error)
+}
 
 type ITracer interface {
 	TraceRequest(
