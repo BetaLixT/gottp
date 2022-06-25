@@ -241,6 +241,13 @@ func (client *HttpClient) WithOptions(
 		pid:     client.pid,
 		flg:     client.flg,
 		optn:    optn,
+	  retr:    retrier.New(
+			retrier.ExponentialBackoff(
+				optn.Retry.RetryCount,
+				optn.Retry.InitialBackoff,
+			),
+			retrier.DefaultClassifier{},
+		),
 	}
 }
 
