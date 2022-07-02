@@ -1,5 +1,5 @@
 # Gottp Http Client
-A simple http client module written in Go
+Gottp is a wrapper over the base http's client functionality written in go, providing additional features of tracing and resilience
 
 ## Installation
 1. Install module
