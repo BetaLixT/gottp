@@ -3,6 +3,7 @@ package gottp
 import (
 	"bytes"
 	"encoding/json"
+	"encoding/xml"
 	"errors"
 	"fmt"
 	"net/http"
@@ -165,6 +166,70 @@ func (HttpClient *HttpClient) DeleteBody(
 	)
 }
 
+func (HttpClient *HttpClient) PostXml(
+	headers map[string]string,
+	body interface{},
+	endpoint string,
+	qParam map[string][]string,
+	params ...string,
+) (*Response, error) {
+	return HttpClient.actionXML(
+		"POST",
+		headers,
+		body,
+		endpoint,
+		qParam, params...,
+	)
+}
+
+func (HttpClient *HttpClient) PatchXml(
+	headers map[string]string,
+	body interface{},
+	endpoint string,
+	qParam map[string][]string,
+	params ...string,
+) (*Response, error) {
+	return HttpClient.actionXML(
+		"PATCH",
+		headers,
+		body,
+		endpoint,
+		qParam, params...,
+	)
+}
+
+func (HttpClient *HttpClient) PutXml(
+	headers map[string]string,
+	body interface{},
+	endpoint string,
+	qParam map[string][]string,
+	params ...string,
+) (*Response, error) {
+	return HttpClient.actionXML(
+		"PUT",
+		headers,
+		body,
+		endpoint,
+		qParam, params...,
+	)
+}
+
+func (HttpClient *HttpClient) DeleteXml(
+	headers map[string]string,
+	body interface{},
+	endpoint string,
+	qParam map[string][]string,
+	params ...string,
+) (*Response, error) {
+	return HttpClient.actionXML(
+		"DELETE",
+		headers,
+		body,
+		endpoint,
+		qParam, params...,
+	)
+}
+
 func (HttpClient *HttpClient) PostForm(
 	headers map[string]string,
 	form url.Values,
@@ -302,6 +367,40 @@ func (HttpClient *HttpClient) actionBody(
 
 	HttpClient.formHeaders(req, headers)
 	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := HttpClient.runRequest(req)
+	if err != nil {
+		return nil, err
+	}
+	respObj := Response(*resp)
+	return &respObj, nil
+}
+
+func (HttpClient *HttpClient) actionXML(
+	method string,
+	headers map[string]string,
+	body interface{},
+	endpoint string,
+	qParam map[string][]string,
+	pthParms ...string,
+) (*Response, error) {
+	endpoint, err := formatEp(endpoint, qParam, pthParms...)
+	if err != nil {
+		return nil, err
+	}
+
+	byts, err := xml.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(method, endpoint, bytes.NewReader(byts))
+	if err != nil {
+		return nil, err
+	}
+
+	HttpClient.formHeaders(req, headers)
+	req.Header.Set("Content-Type", "application/xml")
 
 	resp, err := HttpClient.runRequest(req)
 	if err != nil {
