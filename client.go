@@ -21,9 +21,6 @@ type HttpClient struct {
 	client  IInternalClient
 	tracer  ITracer
 	headers map[string]string
-	tid     string
-	pid     string
-	flg     string
 	optn    *ClientOptions
 	retr    *retrier.Retrier
 }
@@ -337,9 +334,6 @@ func (client *HttpClient) WithOptions(
 		client:  client.client,
 		tracer:  client.tracer,
 		headers: client.headers,
-		tid:     client.tid,
-		pid:     client.pid,
-		flg:     client.flg,
 		optn:    optn,
 	  retr:    retrier.New(
 			retrier.ExponentialBackoff(
@@ -493,34 +487,36 @@ func (HttpClient *HttpClient) formHeaders(
 	}
 }
 
-func (HttpClient *HttpClient) runRequest(
+func (client *HttpClient) runRequest(
 	ctx context.Context,
 	req *http.Request,
 ) (*http.Response, error) {
 	sid, err := hlpr.GenerateParentId()
+	ver, tid, _, rid, flg := client.tracer.ExtractTraceInfo(ctx)
 	if err == nil {
 		req.Header.Add(
 			"traceparent",
-			fmt.Sprintf("00-%s-%s-%s", HttpClient.tid, sid, HttpClient.flg),
+			fmt.Sprintf("%s-%s-%s-%s", ver, tid, sid, flg),
 		)
 	} else {
 		req.Header.Add(
 			"traceparent",
 			fmt.Sprintf(
-				"00-%s-%s-%s",
-				HttpClient.tid,
-				HttpClient.pid,
-				HttpClient.flg,
+				"%s-%s-%s-%s",
+				ver,
+				tid,
+				rid,
+				flg,
 			),
 		)
 	}
 	start := time.Now()
 	var resp *http.Response
-	if HttpClient.optn.Retry.Enabled {
-		HttpClient.retr.Run(func() error {
-			resp, err = HttpClient.client.Do(req)
+	if client.optn.Retry.Enabled {
+		client.retr.Run(func() error {
+			resp, err = client.client.Do(req)
 			if err == nil && resp.StatusCode > 299 {
-				for _, val := range HttpClient.optn.Retry.RetriableCodes {
+				for _, val := range client.optn.Retry.RetriableCodes {
 					if resp.StatusCode == val {
 						return errors.New("")
 					}
@@ -529,12 +525,12 @@ func (HttpClient *HttpClient) runRequest(
 			return nil
 		})
 	} else {
-    resp, err = HttpClient.client.Do(req)
+    resp, err = client.client.Do(req)
 	}
 	end := time.Now()
 
 	if err != nil {
-		HttpClient.tracer.TraceDependency(
+		client.tracer.TraceDependency(
 			ctx,
 			sid,
 			"http",
@@ -549,7 +545,7 @@ func (HttpClient *HttpClient) runRequest(
 		)
 		return nil, err
 	}
-	HttpClient.tracer.TraceDependency(
+	client.tracer.TraceDependency(
 		ctx,
 		sid,
 		"http",
@@ -628,18 +624,12 @@ func formatEp(
 func NewHttpClientProvider(
 	tracer ITracer,
 	headers map[string]string,
-	tid string,
-	pid string,
-	flg string,
 ) *HttpClient {
 	optn := DefaultOptions()
 	return &HttpClient{
 		client:  http.DefaultClient,
 		tracer:  tracer,
 		headers: headers,
-		tid:     tid,
-		pid:     pid,
-		flg:     flg,
 		optn:    optn,
 		retr:    retrier.New(
 			retrier.ExponentialBackoff(
@@ -664,9 +654,6 @@ func NewHttpClientWithClientProvider(
 		client:  client,
 		tracer:  tracer,
 		headers: headers,
-		tid:     tid,
-		pid:     pid,
-		flg:     flg,
 		optn:    optn,
 		retr:    retrier.New(
 			retrier.ExponentialBackoff(

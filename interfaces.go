@@ -10,7 +10,10 @@ type IInternalClient interface {
 	Do (*http.Request) (*http.Response, error)
 }
 
-type ITracer interface {	
+type ITracer interface {
+	ExtractTraceInfo(
+		ctx context.Context,
+	) (ver, tid, pid, rid, flg string)
 	TraceDependency(
 		ctx context.Context,
 		spanId string,
