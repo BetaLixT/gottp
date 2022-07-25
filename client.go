@@ -2,6 +2,7 @@ package gottp
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"encoding/xml"
 	"errors"
@@ -28,12 +29,14 @@ type HttpClient struct {
 }
 
 func (HttpClient *HttpClient) Get(
+	ctx context.Context,
 	headers map[string]string,
 	endpoint string,
 	qParam map[string][]string,
 	params ...string,
 ) (*Response, error) {
 	return HttpClient.action(
+		ctx,
 		"GET",
 		headers,
 		endpoint,
@@ -43,12 +46,14 @@ func (HttpClient *HttpClient) Get(
 }
 
 func (HttpClient *HttpClient) Post(
+	ctx context.Context,
 	headers map[string]string,
 	endpoint string,
 	qParam map[string][]string,
 	params ...string,
 ) (*Response, error) {
 	return HttpClient.action(
+		ctx,
 		"POST",
 		headers,
 		endpoint,
@@ -58,12 +63,14 @@ func (HttpClient *HttpClient) Post(
 }
 
 func (HttpClient *HttpClient) Patch(
+  ctx context.Context,
 	headers map[string]string,
 	endpoint string,
 	qParam map[string][]string,
 	params ...string,
 ) (*Response, error) {
 	return HttpClient.action(
+		ctx,
 		"PATCH",
 		headers,
 		endpoint,
@@ -73,12 +80,14 @@ func (HttpClient *HttpClient) Patch(
 }
 
 func (HttpClient *HttpClient) Put(
+  ctx context.Context,
 	headers map[string]string,
 	endpoint string,
 	qParam map[string][]string,
 	params ...string,
 ) (*Response, error) {
 	return HttpClient.action(
+		ctx,
 		"PUT",
 		headers,
 		endpoint,
@@ -88,12 +97,14 @@ func (HttpClient *HttpClient) Put(
 }
 
 func (HttpClient *HttpClient) Delete(
+	ctx context.Context,
 	headers map[string]string,
 	endpoint string,
 	qParam map[string][]string,
 	params ...string,
 ) (*Response, error) {
 	return HttpClient.action(
+		ctx,
 		"DELETE",
 		headers,
 		endpoint,
@@ -103,6 +114,7 @@ func (HttpClient *HttpClient) Delete(
 }
 
 func (HttpClient *HttpClient) PostBody(
+	ctx context.Context,
 	headers map[string]string,
 	body interface{},
 	endpoint string,
@@ -110,6 +122,7 @@ func (HttpClient *HttpClient) PostBody(
 	params ...string,
 ) (*Response, error) {
 	return HttpClient.actionBody(
+		ctx,
 		"POST",
 		headers,
 		body,
@@ -119,6 +132,7 @@ func (HttpClient *HttpClient) PostBody(
 }
 
 func (HttpClient *HttpClient) PatchBody(
+	ctx context.Context,
 	headers map[string]string,
 	body interface{},
 	endpoint string,
@@ -126,6 +140,7 @@ func (HttpClient *HttpClient) PatchBody(
 	params ...string,
 ) (*Response, error) {
 	return HttpClient.actionBody(
+		ctx,
 		"PATCH",
 		headers,
 		body,
@@ -135,6 +150,7 @@ func (HttpClient *HttpClient) PatchBody(
 }
 
 func (HttpClient *HttpClient) PutBody(
+	ctx context.Context,
 	headers map[string]string,
 	body interface{},
 	endpoint string,
@@ -142,6 +158,7 @@ func (HttpClient *HttpClient) PutBody(
 	params ...string,
 ) (*Response, error) {
 	return HttpClient.actionBody(
+		ctx,
 		"PUT",
 		headers,
 		body,
@@ -151,6 +168,7 @@ func (HttpClient *HttpClient) PutBody(
 }
 
 func (HttpClient *HttpClient) DeleteBody(
+	ctx context.Context,
 	headers map[string]string,
 	body interface{},
 	endpoint string,
@@ -158,6 +176,7 @@ func (HttpClient *HttpClient) DeleteBody(
 	params ...string,
 ) (*Response, error) {
 	return HttpClient.actionBody(
+		ctx,
 		"DELETE",
 		headers,
 		body,
@@ -167,6 +186,7 @@ func (HttpClient *HttpClient) DeleteBody(
 }
 
 func (HttpClient *HttpClient) PostXml(
+	ctx context.Context,
 	headers map[string]string,
 	body interface{},
 	endpoint string,
@@ -174,6 +194,7 @@ func (HttpClient *HttpClient) PostXml(
 	params ...string,
 ) (*Response, error) {
 	return HttpClient.actionXML(
+		ctx,
 		"POST",
 		headers,
 		body,
@@ -183,6 +204,7 @@ func (HttpClient *HttpClient) PostXml(
 }
 
 func (HttpClient *HttpClient) PatchXml(
+	ctx context.Context,
 	headers map[string]string,
 	body interface{},
 	endpoint string,
@@ -190,6 +212,7 @@ func (HttpClient *HttpClient) PatchXml(
 	params ...string,
 ) (*Response, error) {
 	return HttpClient.actionXML(
+		ctx,
 		"PATCH",
 		headers,
 		body,
@@ -199,6 +222,7 @@ func (HttpClient *HttpClient) PatchXml(
 }
 
 func (HttpClient *HttpClient) PutXml(
+	ctx context.Context,
 	headers map[string]string,
 	body interface{},
 	endpoint string,
@@ -206,6 +230,7 @@ func (HttpClient *HttpClient) PutXml(
 	params ...string,
 ) (*Response, error) {
 	return HttpClient.actionXML(
+		ctx,
 		"PUT",
 		headers,
 		body,
@@ -215,6 +240,7 @@ func (HttpClient *HttpClient) PutXml(
 }
 
 func (HttpClient *HttpClient) DeleteXml(
+	ctx context.Context,
 	headers map[string]string,
 	body interface{},
 	endpoint string,
@@ -222,6 +248,7 @@ func (HttpClient *HttpClient) DeleteXml(
 	params ...string,
 ) (*Response, error) {
 	return HttpClient.actionXML(
+		ctx,
 		"DELETE",
 		headers,
 		body,
@@ -231,6 +258,7 @@ func (HttpClient *HttpClient) DeleteXml(
 }
 
 func (HttpClient *HttpClient) PostForm(
+	ctx context.Context,
 	headers map[string]string,
 	form url.Values,
 	endpoint string,
@@ -238,6 +266,7 @@ func (HttpClient *HttpClient) PostForm(
 	params ...string,
 ) (*Response, error) {
 	return HttpClient.actionForm(
+		ctx,
 		"POST",
 		headers,
 		form,
@@ -247,6 +276,7 @@ func (HttpClient *HttpClient) PostForm(
 }
 
 func (HttpClient *HttpClient) PatchForm(
+	ctx context.Context,
 	headers map[string]string,
 	form url.Values,
 	endpoint string,
@@ -254,6 +284,7 @@ func (HttpClient *HttpClient) PatchForm(
 	params ...string,
 ) (*Response, error) {
 	return HttpClient.actionForm(
+		ctx,
 		"PATCH",
 		headers,
 		form,
@@ -263,6 +294,7 @@ func (HttpClient *HttpClient) PatchForm(
 }
 
 func (HttpClient *HttpClient) PutForm(
+	ctx context.Context,
 	headers map[string]string,
 	form url.Values,
 	endpoint string,
@@ -270,6 +302,7 @@ func (HttpClient *HttpClient) PutForm(
 	params ...string,
 ) (*Response, error) {
 	return HttpClient.actionForm(
+		ctx,
 		"PUT",
 		headers,
 		form,
@@ -279,6 +312,7 @@ func (HttpClient *HttpClient) PutForm(
 }
 
 func (HttpClient *HttpClient) DeleteForm(
+	ctx context.Context,
 	headers map[string]string,
 	form url.Values,
 	endpoint string,
@@ -286,6 +320,7 @@ func (HttpClient *HttpClient) DeleteForm(
 	params ...string,
 ) (*Response, error) {
 	return HttpClient.actionForm(
+		ctx,
 		"DELETE",
 		headers,
 		form,
@@ -317,6 +352,7 @@ func (client *HttpClient) WithOptions(
 }
 
 func (HttpClient *HttpClient) action(
+  ctx context.Context,
 	method string,
 	headers map[string]string,
 	endpoint string,
@@ -334,7 +370,7 @@ func (HttpClient *HttpClient) action(
 
 	HttpClient.formHeaders(req, headers)
 
-	resp, err := HttpClient.runRequest(req)
+	resp, err := HttpClient.runRequest(ctx, req)
 	if err != nil {
 		return nil, err
 	}
@@ -343,6 +379,7 @@ func (HttpClient *HttpClient) action(
 }
 
 func (HttpClient *HttpClient) actionBody(
+	ctx context.Context,
 	method string,
 	headers map[string]string,
 	body interface{},
@@ -368,7 +405,7 @@ func (HttpClient *HttpClient) actionBody(
 	HttpClient.formHeaders(req, headers)
 	req.Header.Set("Content-Type", "application/json")
 
-	resp, err := HttpClient.runRequest(req)
+	resp, err := HttpClient.runRequest(ctx, req)
 	if err != nil {
 		return nil, err
 	}
@@ -377,6 +414,7 @@ func (HttpClient *HttpClient) actionBody(
 }
 
 func (HttpClient *HttpClient) actionXML(
+	ctx context.Context,
 	method string,
 	headers map[string]string,
 	body interface{},
@@ -402,7 +440,7 @@ func (HttpClient *HttpClient) actionXML(
 	HttpClient.formHeaders(req, headers)
 	req.Header.Set("Content-Type", "application/xml")
 
-	resp, err := HttpClient.runRequest(req)
+	resp, err := HttpClient.runRequest(ctx, req)
 	if err != nil {
 		return nil, err
 	}
@@ -411,6 +449,7 @@ func (HttpClient *HttpClient) actionXML(
 }
 
 func (HttpClient *HttpClient) actionForm(
+	ctx context.Context,
 	method string,
 	headers map[string]string,
 	form url.Values,
@@ -434,7 +473,7 @@ func (HttpClient *HttpClient) actionForm(
 	HttpClient.formHeaders(req, headers)
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
-	resp, err := HttpClient.runRequest(req)
+	resp, err := HttpClient.runRequest(ctx, req)
 	if err != nil {
 		return nil, err
 	}
@@ -455,6 +494,7 @@ func (HttpClient *HttpClient) formHeaders(
 }
 
 func (HttpClient *HttpClient) runRequest(
+	ctx context.Context,
 	req *http.Request,
 ) (*http.Response, error) {
 	sid, err := hlpr.GenerateParentId()
@@ -495,6 +535,7 @@ func (HttpClient *HttpClient) runRequest(
 
 	if err != nil {
 		HttpClient.tracer.TraceDependency(
+			ctx,
 			sid,
 			"http",
 			req.URL.Hostname(),
@@ -509,6 +550,7 @@ func (HttpClient *HttpClient) runRequest(
 		return nil, err
 	}
 	HttpClient.tracer.TraceDependency(
+		ctx,
 		sid,
 		"http",
 		req.URL.Hostname(),
