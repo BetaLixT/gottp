@@ -7,7 +7,9 @@ import (
 	"net/http"
 )
 
-type Response http.Response
+type Response struct {
+	http.Response
+}
 
 func (resp *Response) Unmarshal(data interface{}) error {
 	bytes, err := io.ReadAll(resp.Body)

@@ -26,3 +26,7 @@ type ITracer interface {
 		fields map[string]string,
 	)
 }
+
+type IRequestBody interface {
+	
+}

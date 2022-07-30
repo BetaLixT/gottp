@@ -17,12 +17,16 @@ import (
 	hlpr "github.com/BetaLixT/gottp/helpers"
 )
 
+type jsonMarshal func(any) ([]byte, error)
+type jsonUnmarshal func([]byte, any) error
+
 type HttpClient struct {
-	client  IInternalClient
-	tracer  ITracer
-	headers map[string]string
-	optn    *ClientOptions
-	retr    *retrier.Retrier
+	client   IInternalClient
+	tracer   ITracer
+	headers  map[string]string
+	optn     *ClientOptions
+	retr     *retrier.Retrier
+	jsonMrsh jsonMarshal
 }
 
 func (HttpClient *HttpClient) Get(
@@ -60,7 +64,7 @@ func (HttpClient *HttpClient) Post(
 }
 
 func (HttpClient *HttpClient) Patch(
-  ctx context.Context,
+	ctx context.Context,
 	headers map[string]string,
 	endpoint string,
 	qParam map[string][]string,
@@ -77,7 +81,7 @@ func (HttpClient *HttpClient) Patch(
 }
 
 func (HttpClient *HttpClient) Put(
-  ctx context.Context,
+	ctx context.Context,
 	headers map[string]string,
 	endpoint string,
 	qParam map[string][]string,
@@ -329,13 +333,13 @@ func (HttpClient *HttpClient) DeleteForm(
 
 func (client *HttpClient) WithOptions(
 	optn *ClientOptions,
-) *HttpClient{
+) *HttpClient {
 	return &HttpClient{
 		client:  client.client,
 		tracer:  client.tracer,
 		headers: client.headers,
 		optn:    optn,
-	  retr:    retrier.New(
+		retr: retrier.New(
 			retrier.ExponentialBackoff(
 				optn.Retry.RetryCount,
 				optn.Retry.InitialBackoff,
@@ -346,7 +350,7 @@ func (client *HttpClient) WithOptions(
 }
 
 func (HttpClient *HttpClient) action(
-  ctx context.Context,
+	ctx context.Context,
 	method string,
 	headers map[string]string,
 	endpoint string,
@@ -372,7 +376,7 @@ func (HttpClient *HttpClient) action(
 	return &respObj, nil
 }
 
-func (HttpClient *HttpClient) actionBody(
+func (client *HttpClient) actionBody(
 	ctx context.Context,
 	method string,
 	headers map[string]string,
@@ -386,7 +390,7 @@ func (HttpClient *HttpClient) actionBody(
 		return nil, err
 	}
 
-	byts, err := json.Marshal(body)
+	byts, err := client.jsonMrsh(body)
 	if err != nil {
 		return nil, err
 	}
@@ -396,10 +400,10 @@ func (HttpClient *HttpClient) actionBody(
 		return nil, err
 	}
 
-	HttpClient.formHeaders(req, headers)
+	client.formHeaders(req, headers)
 	req.Header.Set("Content-Type", "application/json")
 
-	resp, err := HttpClient.runRequest(ctx, req)
+	resp, err := client.runRequest(ctx, req)
 	if err != nil {
 		return nil, err
 	}
@@ -525,7 +529,7 @@ func (client *HttpClient) runRequest(
 			return nil
 		})
 	} else {
-    resp, err = client.client.Do(req)
+		resp, err = client.client.Do(req)
 	}
 	end := time.Now()
 
@@ -557,7 +561,7 @@ func (client *HttpClient) runRequest(
 		// types.NewField("method", req.Method),
 		// types.NewField("statusCode", strconv.Itoa(resp.StatusCode)),
 		map[string]string{
-			"method": req.Method,
+			"method":     req.Method,
 			"statusCode": strconv.Itoa(resp.StatusCode),
 		},
 	)
@@ -631,13 +635,14 @@ func NewHttpClientProvider(
 		tracer:  tracer,
 		headers: headers,
 		optn:    optn,
-		retr:    retrier.New(
+		retr: retrier.New(
 			retrier.ExponentialBackoff(
 				optn.Retry.RetryCount,
 				optn.Retry.InitialBackoff,
 			),
 			retrier.DefaultClassifier{},
 		),
+		jsonMrsh: json.Marshal,
 	}
 }
 
@@ -655,13 +660,14 @@ func NewHttpClientWithClientProvider(
 		tracer:  tracer,
 		headers: headers,
 		optn:    optn,
-		retr:    retrier.New(
+		retr: retrier.New(
 			retrier.ExponentialBackoff(
 				optn.Retry.RetryCount,
 				optn.Retry.InitialBackoff,
 			),
 			retrier.DefaultClassifier{},
 		),
+		jsonMrsh: json.Marshal,
 	}
 }
 
