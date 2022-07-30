@@ -27,6 +27,7 @@ type ITracer interface {
 	)
 }
 
-type IRequestBody interface {
-	
+type IJsonDTO interface {
+	MarshalJSON() ([]byte, error)
+	UnmarshalJSON([]byte) error
 }

@@ -3,7 +3,6 @@ package gottp
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"encoding/xml"
 	"errors"
 	"fmt"
@@ -14,11 +13,8 @@ import (
 	"time"
 
 	"github.com/BetaLixT/go-resiliency/retrier"
-	hlpr "github.com/BetaLixT/gottp/helpers"
+	hlpr "github.com/BetaLixT/gottp/ej/helpers"
 )
-
-type jsonMarshal func(any) ([]byte, error)
-type jsonUnmarshal func([]byte, any) error
 
 type HttpClient struct {
 	client   IInternalClient
@@ -26,7 +22,6 @@ type HttpClient struct {
 	headers  map[string]string
 	optn     *ClientOptions
 	retr     *retrier.Retrier
-	jsonMrsh jsonMarshal
 }
 
 func (HttpClient *HttpClient) Get(
@@ -117,7 +112,7 @@ func (HttpClient *HttpClient) Delete(
 func (HttpClient *HttpClient) PostBody(
 	ctx context.Context,
 	headers map[string]string,
-	body interface{},
+	body IJsonDTO,
 	endpoint string,
 	qParam map[string][]string,
 	params ...string,
@@ -135,7 +130,7 @@ func (HttpClient *HttpClient) PostBody(
 func (HttpClient *HttpClient) PatchBody(
 	ctx context.Context,
 	headers map[string]string,
-	body interface{},
+	body IJsonDTO,
 	endpoint string,
 	qParam map[string][]string,
 	params ...string,
@@ -153,7 +148,7 @@ func (HttpClient *HttpClient) PatchBody(
 func (HttpClient *HttpClient) PutBody(
 	ctx context.Context,
 	headers map[string]string,
-	body interface{},
+	body IJsonDTO,
 	endpoint string,
 	qParam map[string][]string,
 	params ...string,
@@ -171,7 +166,7 @@ func (HttpClient *HttpClient) PutBody(
 func (HttpClient *HttpClient) DeleteBody(
 	ctx context.Context,
 	headers map[string]string,
-	body interface{},
+	body IJsonDTO,
 	endpoint string,
 	qParam map[string][]string,
 	params ...string,
@@ -380,7 +375,7 @@ func (client *HttpClient) actionBody(
 	ctx context.Context,
 	method string,
 	headers map[string]string,
-	body interface{},
+	body IJsonDTO,
 	endpoint string,
 	qParam map[string][]string,
 	pthParms ...string,
@@ -390,7 +385,7 @@ func (client *HttpClient) actionBody(
 		return nil, err
 	}
 
-	byts, err := client.jsonMrsh(body)
+	byts, err := body.MarshalJSON() 
 	if err != nil {
 		return nil, err
 	}
@@ -642,7 +637,6 @@ func NewHttpClientProvider(
 			),
 			retrier.DefaultClassifier{},
 		),
-		jsonMrsh: json.Marshal,
 	}
 }
 
@@ -667,7 +661,6 @@ func NewHttpClientWithClientProvider(
 			),
 			retrier.DefaultClassifier{},
 		),
-		jsonMrsh: json.Marshal,
 	}
 }
 

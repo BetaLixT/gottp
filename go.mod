@@ -1,4 +1,4 @@
-module github.com/BetaLixT/gottp
+module github.com/BetaLixT/gottp/ej
 
 go 1.18
 

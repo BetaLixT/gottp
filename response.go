@@ -1,22 +1,19 @@
 package gottp
 
 import (
-	"encoding/json"
 	"encoding/xml"
 	"io"
 	"net/http"
 )
 
-type Response struct {
-	http.Response
-}
+type Response http.Response
 
-func (resp *Response) Unmarshal(data interface{}) error {
+func (resp *Response) Unmarshal(data IJsonDTO) error {
 	bytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return err
 	}
-	err = json.Unmarshal(bytes, data)
+	err = data.UnmarshalJSON(bytes)
 	if err != nil {
 		return err
 	}
