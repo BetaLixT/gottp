@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/BetaLixT/go-resiliency/retrier"
-	hlpr "github.com/BetaLixT/gottp/ej/helpers"
+	hlpr "github.com/BetaLixT/gottp/helpers"
 )
 
 type HttpClient struct {
