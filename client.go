@@ -1,3 +1,4 @@
+// Package gottp http client
 package gottp
 
 import (
@@ -16,14 +17,16 @@ import (
 	hlpr "github.com/BetaLixT/gottp/helpers"
 )
 
+// HttpClient encapsulating REST functionality
 type HttpClient struct {
-	client   IInternalClient
-	tracer   ITracer
-	headers  map[string]string
-	optn     *ClientOptions
-	retr     *retrier.Retrier
+	client  IInternalClient
+	tracer  ITracer
+	headers map[string]string
+	optn    *ClientOptions
+	retr    *retrier.Retrier
 }
 
+// Get HTTP GET method
 func (HttpClient *HttpClient) Get(
 	ctx context.Context,
 	headers map[string]string,
@@ -41,6 +44,7 @@ func (HttpClient *HttpClient) Get(
 	)
 }
 
+// Post HTTP POST method
 func (HttpClient *HttpClient) Post(
 	ctx context.Context,
 	headers map[string]string,
@@ -58,6 +62,7 @@ func (HttpClient *HttpClient) Post(
 	)
 }
 
+// Patch HTTP PATH method
 func (HttpClient *HttpClient) Patch(
 	ctx context.Context,
 	headers map[string]string,
@@ -75,6 +80,7 @@ func (HttpClient *HttpClient) Patch(
 	)
 }
 
+// Put HTTP PUT method
 func (HttpClient *HttpClient) Put(
 	ctx context.Context,
 	headers map[string]string,
@@ -92,6 +98,7 @@ func (HttpClient *HttpClient) Put(
 	)
 }
 
+// Delete HTTP DELETE method
 func (HttpClient *HttpClient) Delete(
 	ctx context.Context,
 	headers map[string]string,
@@ -109,6 +116,7 @@ func (HttpClient *HttpClient) Delete(
 	)
 }
 
+// PostBody HTTP POST method with JSON Body
 func (HttpClient *HttpClient) PostBody(
 	ctx context.Context,
 	headers map[string]string,
@@ -127,6 +135,7 @@ func (HttpClient *HttpClient) PostBody(
 	)
 }
 
+// PatchBody HTTP PATCH method with JSON Body
 func (HttpClient *HttpClient) PatchBody(
 	ctx context.Context,
 	headers map[string]string,
@@ -145,6 +154,7 @@ func (HttpClient *HttpClient) PatchBody(
 	)
 }
 
+// PutBody HTTP PUT method with JSON Body
 func (HttpClient *HttpClient) PutBody(
 	ctx context.Context,
 	headers map[string]string,
@@ -163,6 +173,7 @@ func (HttpClient *HttpClient) PutBody(
 	)
 }
 
+// DeleteBody HTTP DELETE method with JSON Body
 func (HttpClient *HttpClient) DeleteBody(
 	ctx context.Context,
 	headers map[string]string,
@@ -181,6 +192,7 @@ func (HttpClient *HttpClient) DeleteBody(
 	)
 }
 
+// PostXml HTTP POST method with XML Body
 func (HttpClient *HttpClient) PostXml(
 	ctx context.Context,
 	headers map[string]string,
@@ -199,6 +211,7 @@ func (HttpClient *HttpClient) PostXml(
 	)
 }
 
+// PatchXml HTTP PATCH method with XML Body
 func (HttpClient *HttpClient) PatchXml(
 	ctx context.Context,
 	headers map[string]string,
@@ -217,6 +230,7 @@ func (HttpClient *HttpClient) PatchXml(
 	)
 }
 
+// PutXml HTTP PUT method with XML Body
 func (HttpClient *HttpClient) PutXml(
 	ctx context.Context,
 	headers map[string]string,
@@ -235,6 +249,7 @@ func (HttpClient *HttpClient) PutXml(
 	)
 }
 
+// DeleteXml HTTP DELETE method with XML Body
 func (HttpClient *HttpClient) DeleteXml(
 	ctx context.Context,
 	headers map[string]string,
@@ -253,6 +268,7 @@ func (HttpClient *HttpClient) DeleteXml(
 	)
 }
 
+// PostForm HTTP POST method with Form Body
 func (HttpClient *HttpClient) PostForm(
 	ctx context.Context,
 	headers map[string]string,
@@ -271,6 +287,7 @@ func (HttpClient *HttpClient) PostForm(
 	)
 }
 
+// PatchForm HTTP PATCH method with Form Body
 func (HttpClient *HttpClient) PatchForm(
 	ctx context.Context,
 	headers map[string]string,
@@ -289,6 +306,7 @@ func (HttpClient *HttpClient) PatchForm(
 	)
 }
 
+// PutForm HTTP PUT method with Form Body
 func (HttpClient *HttpClient) PutForm(
 	ctx context.Context,
 	headers map[string]string,
@@ -307,6 +325,7 @@ func (HttpClient *HttpClient) PutForm(
 	)
 }
 
+// DeleteForm HTTP DELETE method with Form Body
 func (HttpClient *HttpClient) DeleteForm(
 	ctx context.Context,
 	headers map[string]string,
@@ -385,7 +404,7 @@ func (client *HttpClient) actionBody(
 		return nil, err
 	}
 
-	byts, err := body.MarshalJSON() 
+	byts, err := body.MarshalJSON()
 	if err != nil {
 		return nil, err
 	}
